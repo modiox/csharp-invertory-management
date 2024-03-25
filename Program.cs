@@ -28,7 +28,10 @@ public class Program {
             Quantity = quantity; 
             DateCreated = dateCreated == default ? DateTime.Now : dateCreated;
 
+
         }
+
+        //To define how the object itmes are represented
          public override string ToString(){
          return $"Item Name: {Name}, Item Quanitity: {Quantity}, Date Created: {DateCreated}";
          }
@@ -81,7 +84,7 @@ public class Program {
        }
        else 
        { Console.WriteLine("Item not found"); 
-       return null; } //if I don't include this, it causes an error in the function name(: not all code paths return a value)
+       return null; } //if I don't include this, it causes an error in the function name("not all code paths return a value")
 
     }
      public int GetCurrentVolume(){
@@ -98,6 +101,17 @@ public class Program {
             return items.OrderBy(i => i.CreatedDate).ToList();
         else
             return items.OrderByDescending(i => i.CreatedDate).ToList();
+    }
+     public Dictionary<string, List<Item>> GroupByDate(){
+        var today = DateTime.Now;
+        var newItems = items.Where(i => (today - i.CreatedDate).TotalDays <= 90).ToList();
+        var oldItems = items.Except(newItems).ToList();
+
+        return new Dictionary<string, List<Item>>
+        {
+            { "New Arrival", newItems },
+            { "Old", oldItems }
+        };
     }
     public void PrintItems() {
         foreach( var item in items){ 
@@ -133,17 +147,36 @@ public class Program {
         store.AddItem(waterBottle2);
         store.AddItem(coffee);
         store.AddItem(pen);
-       // store.DeleteItem("Water Gallon");
-        store.PrintItems();
+       //store.DeleteItem("Water Gallon");
        var volume= store.GetCurrentVolume();
         Console.WriteLine($"The voulme is == {volume}");
-       // store.FindItemByName("Water Gallon");
+       //store.FindItemByName("Water Gallon");
+
+          // Sorting items by name ASC
         var collections =store.SortByNameAsc();
         foreach(var item in collections){  
             Console.WriteLine($"Sorted ASC: {item}");
-
-
         }
+
+         // Sorting items by date
+        var sortedItemsByDate = store.SortByDate(SortOrder.DESC);
+        Console.WriteLine("Sorted items by date:");
+        foreach (var item in sortedItemsByDate)
+        {
+            Console.WriteLine($"{item.Name} - {item.CreatedDate.ToShortDateString()}");
+        }
+
+        // Grouping items by date
+        var groupedItems = store.GroupByDate();
+        foreach (var group in groupedItems)
+        {
+            Console.WriteLine($"{group.Key} Items:");
+            foreach (var item in group.Value)
+            {
+                Console.WriteLine($" - {item.Name}, Created: {item.CreatedDate.ToShortDateString()}");
+            }
+        }
+   
        
 
         
