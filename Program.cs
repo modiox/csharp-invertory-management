@@ -21,7 +21,7 @@ public class Program {
         private DateTime DateCreated { get; set; }
           //Constructor parameter 
         public Item(string name, int quantity, DateTime dateCreated = default) { 
-            if(Quantity < 0){ 
+            if(quantity < 0){ 
                 Console.WriteLine("Quantity cannot be negative");
             }
             Name= name; 
@@ -42,6 +42,10 @@ public class Program {
       private List<Item> items = new List<Item>();
 
     public int MaxCapacity { get; }
+    public Store(int maxCapacity)
+    {
+        MaxCapacity = maxCapacity;
+    }
     public void AddItem(Item item) {
         //Do not add if it already exists
         bool itemExists = items.Any((i) => i.Name == item.Name);
@@ -53,25 +57,28 @@ public class Program {
 
         items.Add(item);
 
-        // if (item.Count < MaxCapacity)
-        // {
-        //     item.Add(item);
-        //     Console.WriteLine($"Item '{item.Name}' added successfully.");
-        // }
-        // else
-        // {
-        //     Console.WriteLine($"Store is at maximum capacity. Cannot add '{item.Name}'.");
-        // }
+        if (items.Count < MaxCapacity)
+    {
+        items.Add(item);
+        Console.WriteLine($"Item '{item.Name}' added successfully.");
     }
-    public void DeleteItem(string itemName) {
+    else
+    {
+        Console.WriteLine($"Store is at maximum capacity. Cannot add '{item.Name}'.");
+    }
+    }
+    public bool DeleteItem(string itemName) {
         //Find the item then remove 
        Item DeleteItem = items.FirstOrDefault(i => i.Name == itemName);
        if(DeleteItem != null) { 
         items.Remove(DeleteItem);
-        Console.WriteLine("Item is deleted..");
+        Console.WriteLine($"Item is deleted..The item is ( {DeleteItem} )");
+        return true;
        }
-       else 
-       { Console.WriteLine("Item not found"); }
+       else { 
+        Console.WriteLine("Item not found"); 
+        return false;
+       }
 
     }
      public Item FindItemByName(string itemName) {
@@ -84,7 +91,7 @@ public class Program {
        }
        else 
        { Console.WriteLine("Item not found"); 
-       return null; } //if I don't include this, it causes an error in the function name("not all code paths return a value")
+       return null; }
 
     }
      public int GetCurrentVolume(){
@@ -103,6 +110,10 @@ public class Program {
             return items.OrderByDescending(i => i.CreatedDate).ToList();
     }
      public Dictionary<string, List<Item>> GroupByDate(){
+
+        if(items == null){ 
+            return new Dictionary<string, List<Item>>();
+        }
         var today = DateTime.Now;
         var newItems = items.Where(i => (today - i.CreatedDate).TotalDays <= 90).ToList();
         var oldItems = items.Except(newItems).ToList();
@@ -112,6 +123,7 @@ public class Program {
             { "New Arrival", newItems },
             { "Old", oldItems }
         };
+
     }
     public void PrintItems() {
         foreach( var item in items){ 
@@ -125,6 +137,7 @@ public class Program {
 
      public class MyClass { 
      public static void Main(string [] args) { 
+        var storeCapacity = new Store(100);
         var waterBottle = new Item ("Water Bottle", 10, new DateTime (2023, 1, 1));
         var waterBottle2 = new Item ("Water Gallon", 14, new DateTime (2023, 1, 1));
         var chocolateBar = new Item("Chocolate Bar", 15, new DateTime(2023, 2, 1));
@@ -141,29 +154,37 @@ public class Program {
         var batteries = new Item("Batteries", 10);
         var umbrella = new Item("Umbrella", 5);
         var sunscreen = new Item("Sunscreen", 8);
-        // Console.WriteLine($"Item {waterBottle}");
-        var store = new Store();
+
+        //100 max capacity
+        var store = new Store(100);
+        //Adding items
         store.AddItem(waterBottle);
         store.AddItem(waterBottle2);
         store.AddItem(coffee);
         store.AddItem(pen);
-       //store.DeleteItem("Water Gallon");
-       var volume= store.GetCurrentVolume();
-        Console.WriteLine($"The voulme is == {volume}");
-       //store.FindItemByName("Water Gallon");
 
-          // Sorting items by name ASC
+        //Delete an item
+        store.DeleteItem("Water Gallon");
+
+        //Retrieve volume
+        var volume= store.GetCurrentVolume();
+        Console.WriteLine($"The voulme is == {volume}");
+
+        //Finding by name
+        store.FindItemByName("Coffee");
+
+        // Sorting items by name ASC
         var collections =store.SortByNameAsc();
         foreach(var item in collections){  
             Console.WriteLine($"Sorted ASC: {item}");
         }
 
-         // Sorting items by date
+        // Sorting items by date
         var sortedItemsByDate = store.SortByDate(SortOrder.DESC);
         Console.WriteLine("Sorted items by date:");
         foreach (var item in sortedItemsByDate)
         {
-            Console.WriteLine($"{item.Name} - {item.CreatedDate.ToShortDateString()}");
+            Console.WriteLine($"{item.Name} - {item.CreatedDate.ToShortDateString()}"); //To shorten the date format
         }
 
         // Grouping items by date
