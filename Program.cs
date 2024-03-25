@@ -11,7 +11,12 @@ public enum SortOrder
 public class Program { 
     public class Item { 
         public string? Name { get; }
-        public int Quantity { get; set; }
+        private int Quantity;
+        public int quantity { 
+            get {return Quantity; }
+            set{Quantity = value; }
+        }
+        public DateTime CreatedDate { get; }
 
         private DateTime DateCreated { get; set; }
           //Constructor parameter 
@@ -57,15 +62,50 @@ public class Program {
     }
     public void DeleteItem(string itemName) {
         //Find the item then remove 
+       Item DeleteItem = items.FirstOrDefault(i => i.Name == itemName);
+       if(DeleteItem != null) { 
+        items.Remove(DeleteItem);
+        Console.WriteLine("Item is deleted..");
+       }
+       else 
+       { Console.WriteLine("Item not found"); }
 
+    }
+     public Item FindItemByName(string itemName) {
+        //Find the item then remove 
+       Item ItemFound = items.FirstOrDefault(i => i.Name == itemName);
+       if(ItemFound != null) { 
+        Console.WriteLine( $"Item Found {ItemFound} "); 
+        return ItemFound;
+        
+       }
+       else 
+       { Console.WriteLine("Item not found"); 
+       return null; } //if I don't include this, it causes an error in the function name(: not all code paths return a value)
+
+    }
+     public int GetCurrentVolume(){
+        return items.Sum(i => i.quantity);
     } 
+      public List<Item> SortByNameAsc()
+    {
+        return items.OrderBy(i => i.Name).ToList();
+    }
+
+    public List<Item> SortByDate(SortOrder order)
+    {
+        if (order == SortOrder.ASC)
+            return items.OrderBy(i => i.CreatedDate).ToList();
+        else
+            return items.OrderByDescending(i => i.CreatedDate).ToList();
+    }
     public void PrintItems() {
         foreach( var item in items){ 
             Console.WriteLine(item); 
         }
 
-    } 
-    
+    }
+
     }
 
 
@@ -77,7 +117,11 @@ public class Program {
         var store = new Store();
         store.AddItem(waterBottle);
         store.AddItem(waterBottle2);
+       // store.DeleteItem("Water Gallon");
         store.PrintItems();
+       var volume= store.GetCurrentVolume();
+        Console.WriteLine($"The voulme is == {volume}");
+        store.FindItemByName("Water Gallon");
 
 
         
