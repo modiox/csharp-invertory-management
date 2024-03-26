@@ -30,7 +30,7 @@ public class Program
             }
             Name = name;
             Quantity = quantity;
-            DateCreated = dateCreated == default ? DateTime.Now : dateCreated;
+            CreatedDate = dateCreated != default ? dateCreated : DateTime.Now;
 
 
         }
