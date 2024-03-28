@@ -31,7 +31,7 @@ namespace  StoreManagement {
     //To define how the object itmes are represented
     public override string ToString()
     {
-        return $"Item Name: {Name}, Item Quanitity: {Quantity}, Date Created: {DateCreated}";
+        return $"Item Name: {Name}, Item Quanitity: {Quantity}, Date Created: {CreatedDate}";
     }
 
 }
