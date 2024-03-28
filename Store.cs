@@ -96,11 +96,18 @@ namespace StoreManagement
             {
 
                 var today = DateTime.Now;
+                var newThresholdDate = today.AddMonths(-3); // Three months ago from today
 
-                var groupedItems = items.GroupBy(item => (today - item.CreatedDate).TotalDays <= 90 ? "New Arrival" : "Old")
-                                        .ToDictionary(group => group.Key, group => group.ToList());
+                var newItems = items.Where(item => item.CreatedDate >= newThresholdDate).ToList();
+                var oldItems = items.Where(item => item.CreatedDate < newThresholdDate).ToList();
+
+                var groupedItems = new Dictionary<string, List<Item>> {
+                         { "New Arrival", newItems },
+                         { "Old", oldItems }
+                 };
 
                 return groupedItems;
+
 
             }
 
@@ -129,12 +136,12 @@ namespace StoreManagement
                 var waterBottle2 = new Item("Water Gallon", 14, new DateTime(2023, 1, 1));
                 var chocolateBar = new Item("Chocolate Bar", 15, new DateTime(2023, 2, 1));
                 var notebook = new Item("Notebook", 5, new DateTime(2023, 3, 1));
-                var pen = new Item("Pen", 20, new DateTime(2023, 4, 1));
-                var tissuePack = new Item("Tissue Pack", 30, new DateTime(2023, 5, 1));
+                var pen = new Item("Pen", 20, new DateTime(2023, 3, 1));
+                var tissuePack = new Item("Tissue Pack", 30, new DateTime(2024, 1, 1));
                 var chipsBag = new Item("Chips Bag", 25, new DateTime(2023, 12, 1));
                 var sodaCan = new Item("Soda Can", 8, new DateTime(2023, 12, 12));
                 var soap = new Item("Soap", 12, new DateTime(2023, 8, 10));
-                var shampoo = new Item("Shampoo", 40, new DateTime(2023, 9, 9));
+                var shampoo = new Item("Shampoo", 40, new DateTime(2023, 12, 12));
                 // var toothbrush = new Item("Toothbrush", 50, new DateTime(2023, 10, 1));
                 // var coffee = new Item("Coffee", 20);
                 // var sandwich = new Item("Sandwich", 15);
@@ -196,9 +203,7 @@ namespace StoreManagement
                     Console.WriteLine($"{group.Key} Items:");
                     foreach (var item in group.Value)
                     {
-
                         Console.WriteLine($" - {item.Name}, Created: {item.CreatedDate.ToShortDateString()}");
-
                     }
                 }
             }
